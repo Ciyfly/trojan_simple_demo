@@ -1,0 +1,71 @@
+<!--
+ * @Author: Recar
+ * @Date: 2022-10-03 08:18:20
+ * @LastEditors: Recar
+ * @LastEditTime: 2022-10-03 11:20:07
+-->
+<html>
+
+<title>miansha3 cmd</title>
+<script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
+<body>
+<h1>miansha3 cmd</h1>
+
+<h3>name: {{name}}  ip: {{ip}}</h3>
+<div >
+    cmd: <input type="text" name="cmd" id="cmd">
+    <input type="hidden" value="{{name}}", id="name">
+    <input type="hidden" value="{{ip}}", id="ip">
+    </br>
+    <input type="button" onclick="execSubmit()" value="提交" class="button"/>
+    </div>
+
+<h3>结果</h3>
+<pre id="result"><pre>
+
+</body>
+
+<script type="text/javascript">
+    var isLoaded = false;
+    var cmd_id;
+    function getResult(){
+        $.ajax({
+                url: "/result/"+cmd_id,
+                type: "GET",
+                success: function (data) {
+                    if (data.result==""|| data.result==null){
+                        $("#result").text("命令执行中");
+                    }else{
+                        $("#result").text(data.result);
+                        isLoaded = false;
+                    }
+                }
+            });
+    }
+    function execSubmit(){
+        var cmd = $("#cmd").val();
+        var name = $("#name").val();
+        var ip = $("#ip").val();
+        if (cmd==""){
+            alert("命令不能为空")
+        }else{
+            $.ajax({
+                url: "/cmd/"+name+"/"+ip+"/",
+                type: "POST",
+                contentType: 'application/json',
+                data: JSON.stringify({"cmd": cmd}),
+                datatype: 'json',
+                success: function (data) {
+                    isLoaded = true
+                    cmd_id = data.cmd_id
+                }
+            });
+    
+        }
+    }
+    setInterval(function() {
+        isLoaded && getResult();
+        }, 2000);
+
+</script>
+</html>
